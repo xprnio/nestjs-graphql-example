@@ -1,4 +1,5 @@
-import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
+import { TeamInput } from './team.model';
 import { TeamService } from './team.service';
 
 @Controller('teams')
@@ -24,6 +25,12 @@ export class TeamController {
       throw new NotFoundException('Team not found');
     }
 
+    return { team };
+  }
+
+  @Post()
+  async createTeam(@Body() data: TeamInput) {
+    const team = await this.teamService.createTeam(data);
     return { team };
   }
 }

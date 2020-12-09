@@ -1,4 +1,5 @@
-import { Controller, Get, NotFoundException, Param } from '@nestjs/common';
+import { Body, Controller, Get, NotFoundException, Param, Post } from '@nestjs/common';
+import { UserInput } from './user.model';
 import { UserService } from './user.service';
 
 @Controller('users')
@@ -24,6 +25,12 @@ export class UserController {
       throw new NotFoundException('User not found');
     }
 
+    return { user };
+  }
+
+  @Post()
+  async createUser(@Body() data: UserInput) {
+    const user = await this.userService.createUser(data);
     return { user };
   }
 }
