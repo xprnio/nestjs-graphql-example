@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './modules/users/user.module';
 import { TeamModule } from './modules/teams/team.module';
@@ -14,9 +12,9 @@ import { User } from './modules/users/user.model';
       type: 'postgres',
       host: 'localhost',
       port: 5432,
-      username: 'postgres',
-      password: 'password',
-      database: 'island',
+      username: 'example',
+      password: 'example',
+      database: 'example',
       entities: [ Team, User ],
       synchronize: true,
     }),
@@ -25,8 +23,6 @@ import { User } from './modules/users/user.model';
     UserModule,
     TeamModule,
   ],
-  controllers: [ AppController ],
-  providers: [ AppService ],
 })
 export class AppModule {
 }
