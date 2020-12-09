@@ -9,7 +9,6 @@ import { TeamModule } from '../teams/team.module';
 @Module({
   imports: [
     TypeOrmModule.forFeature([ User ]),
-
     forwardRef(() => TeamModule),
   ],
   providers: [ UserService, UserResolver ],

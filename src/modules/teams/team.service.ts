@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 
-import { Team } from './team.model';
+import { Team, TeamInput } from './team.model';
 import { UserService } from '../users/user.service';
 
 @Injectable()
@@ -11,6 +11,7 @@ export class TeamService {
   constructor(
     @InjectRepository(Team)
     private readonly teamRepository: Repository<Team>,
+    @Inject(forwardRef(() => UserService))
     private readonly userService: UserService,
   ) {
   }
@@ -34,6 +35,11 @@ export class TeamService {
     });
   }
 
+  createTeam(data: TeamInput) {
+    const team = this.teamRepository.create(data);
+    return this.teamRepository.save(team);
+  }
+
   async addMember(teamId: number, userId: number) {
     const team = await this.findById(teamId);
 
@@ -41,7 +47,7 @@ export class TeamService {
 
     const user = await this.userService.findById(userId);
     if (user) {
-      team.members.push(user);
+      (await team.members).push(user);
 
       await this.teamRepository.save(team);
     }
@@ -51,11 +57,12 @@ export class TeamService {
 
   async removeMember(teamId: number, userId: number) {
     const team = await this.findById(teamId);
+    const members = await team.members;
 
-    const index = team.members.findIndex(member => member.id === userId);
+    const index = members.findIndex(member => member.id === userId);
 
     if (index >= 0) {
-      team.members.splice(index, 1);
+      members.splice(index, 1);
       await this.teamRepository.save(team);
     }
 

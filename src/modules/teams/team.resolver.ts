@@ -1,7 +1,6 @@
-import { Args, Mutation, Parent, Query, ResolveProperty, Resolver } from '@nestjs/graphql';
-import { Team } from './team.model';
+import { Args, Int, Mutation, Parent, Query, ResolveField, ResolveProperty, Resolver } from '@nestjs/graphql';
+import { Team, TeamInput } from './team.model';
 import { TeamService } from './team.service';
-import { Int } from 'type-graphql';
 import { UserService } from '../users/user.service';
 import { forwardRef, Inject } from '@nestjs/common';
 import { User } from '../users/user.model';
@@ -15,9 +14,19 @@ export class TeamResolver {
   ) {
   }
 
+  @Query(returns => [Team], {name: 'teams', nullable: true})
+  async getTeams() {
+    return this.teamService.findAll();
+  }
+
   @Query(returns => Team, { name: 'team', nullable: true })
   async getTeamById(@Args({ name: 'id', type: () => Int }) id: number) {
     return this.teamService.findById(id);
+  }
+
+  @Mutation(() => Team, { name: 'createTeam'})
+  async createTeam(@Args('data') input: TeamInput): Promise<Team> {
+    return this.teamService.createTeam(input);
   }
 
   @Mutation(returns => Team, { nullable: true })
@@ -36,10 +45,8 @@ export class TeamResolver {
     return this.teamService.removeMember(teamId, userId);
   }
 
-  @ResolveProperty('members', returns => [ User ], { nullable: true })
+  @ResolveField('members', returns => [ User ], { nullable: true })
   async getMembers(@Parent() team: Team) {
-    return this.userService.findByIds(
-      team.members.map(user => user.id),
-    );
+    return await team.members;
   }
 }

@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, ManyToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
-import { Field, Int, ObjectType } from 'type-graphql';
+import { Field, Int, ObjectType, InputType } from '@nestjs/graphql';
 import { Team } from '../teams/team.model';
 
 @Entity('users')
@@ -18,12 +18,24 @@ export class User {
   lastName: string;
 
   @ManyToMany(() => Team, team => team.members)
-  @Field(() => [ Team ], { nullable: true })
-  teams: Team[];
+  @Field(type => [ Team ], { nullable: true })
+  teams: Promise<Team[]>;
 
   @CreateDateColumn()
   createdAt: Date;
 
   @UpdateDateColumn()
   updatedAt: Date;
+}
+
+@InputType()
+export class UserInput {
+  @Field({ nullable: false })
+  firstName: string;
+
+  @Field({ nullable: false })
+  lastName: string;
+
+  @Field(() => Int, { nullable: true })
+  teamId?: number;
 }
